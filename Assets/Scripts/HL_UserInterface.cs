@@ -8,6 +8,7 @@ public enum EButtonPressEvent : int
 {
     BEVENT_ADD_SCORE = 0,
     BEVENT_SUB_SCORE,
+    BEVENT_RESET_SCORE,
     BEVENT_MAX,
 }
 public class HL_UserInterface : MonoBehaviour
@@ -21,7 +22,7 @@ public class HL_UserInterface : MonoBehaviour
     void Start()
     {
         ScoreTextObject= ScoreTextGameObject.GetComponent<TextMeshProUGUI>();
-        ScoreTextObject.SetText("Score : " + Score);
+        ScoreTextObject.SetText(Score.ToString());
     }
 
     private void Awake()
@@ -43,6 +44,11 @@ public class HL_UserInterface : MonoBehaviour
                     Score -= 15;
                     goto LABEL_SCORE_UPDATE;
                 }
+            case EButtonPressEvent.BEVENT_RESET_SCORE:
+                {
+                    Score = 0;
+                    goto LABEL_SCORE_UPDATE;
+                }
             default:
                 {
                     //Invalid Event
@@ -55,7 +61,7 @@ LABEL_PROCESS_EVENT:
         return;
 
 LABEL_SCORE_UPDATE:
-        ScoreTextObject.SetText("Score : " + Score);
+        ScoreTextObject.SetText(Score.ToString());
         goto LABEL_PROCESS_EVENT;
 
     }
