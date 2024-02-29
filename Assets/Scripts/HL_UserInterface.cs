@@ -11,8 +11,11 @@ public enum EButtonPressEvent : int
     BEVENT_RANDOM_SCORE,
     BEVENT_SHOWHIDE_KEY,
     BEVENT_EXIT_GAME,
+    BEVENT_SET_SCORE_CUSTOM,
     BEVENT_MAX,
 }
+
+
 public class HL_UserInterface : MonoBehaviour
 {
     // Start is called before the first frame update
@@ -20,23 +23,68 @@ public class HL_UserInterface : MonoBehaviour
     public GameObject ScoreTextGameObject = null;
     public GameObject KeyImageGameObject = null;
     public GameObject RgbaTestImageGameObject = null;
+    public GameObject InputFieldGameObject = null;
 
     private Color colRgbaTestImage = Color.white;
 
+    
     TextMeshProUGUI ScoreTextObject = null;
     UnityEngine.UI.Image RgbaTestImage = null;
+    TMP_InputField InputFieldObject = null;
+
 
     int Score = 0;
     void Start()
     {
-        ScoreTextObject= ScoreTextGameObject.GetComponent<TextMeshProUGUI>();
+        InputFieldObject = InputFieldGameObject.GetComponent<TMP_InputField>();
+        InputFieldObject.textComponent.text = "343";
+
+        ScoreTextObject = ScoreTextGameObject.GetComponent<TextMeshProUGUI>();
         RgbaTestImage = RgbaTestImageGameObject.GetComponent<UnityEngine.UI.Image>();
-        ScoreTextObject.SetText(Score.ToString());
+ 
     }
     private void Awake()
     {
 
     }
+
+    public void OnInputTextValueUpdate(TMP_InputField _InputFieldObject)
+    {
+        if (_InputFieldObject.gameObject.name == "ScoreUpdateField")
+        {
+
+        }
+    }
+
+    public void OnInputTextEditEnd(TMP_InputField _InputFieldObject)
+    {
+
+    }
+
+    public void OnInputTextSelect(TMP_InputField _InputFieldObject)
+    {
+
+    }
+
+    public void OnInputTextDeselect(TMP_InputField _InputFieldObject)
+    {
+
+    }
+
+    public void UpdateScore(int NewScore)
+    {
+        if (NewScore == 0)
+            Score = 0;
+        else
+        {
+            Score += NewScore;
+        }
+
+        Score = Mathf.Clamp(Score,0, 999999999);
+
+        ScoreTextObject.SetText(Score.ToString());
+    }
+
     public void OnSliderValueUpdate(UnityEngine.UI.Slider _Slider)
     {
         _Slider.gameObject.transform.Find("ValueText").GetComponent<TextMeshProUGUI>().SetText(((int)(_Slider.value * 255f)).ToString());
@@ -74,7 +122,7 @@ public class HL_UserInterface : MonoBehaviour
                 }
             case EButtonPressEvent.BEVENT_RANDOM_SCORE:
                 {
-                    Score += Random.Range(-999999999, 999999999);
+                    UpdateScore(Random.Range(-999999999, 999999999));
                     goto LABEL_SCORE_UPDATE;
                 }
             case EButtonPressEvent.BEVENT_SHOWHIDE_KEY:
@@ -86,6 +134,18 @@ public class HL_UserInterface : MonoBehaviour
                 {
                     goto LABEL_POST_PROCESS_EVENT_ON_EXIT;
                 }
+            case EButtonPressEvent.BEVENT_SET_SCORE_CUSTOM:
+                {
+                    if (InputFieldObject.text.Length > 0)
+                    {
+                            Score = int.Parse(InputFieldObject.text);
+                            goto LABEL_SCORE_UPDATE;
+                        
+                    }
+                    goto LABEL_POST_PROCESS_EVENT_ON_EXIT;
+
+                }
+
             default:
                 {
                     //Invalid Event
@@ -104,17 +164,11 @@ public class HL_UserInterface : MonoBehaviour
 
     LABEL_SCORE_UPDATE:
 
-        if (Score < 0)
-            Score = 0;
-        else if (Score > 999999999)
-            Score = 999999999;
-        
+        Score = Mathf.Clamp(Score, 0, 999999999);
         ScoreTextObject.SetText(Score.ToString());
         goto LABEL_POST_PROCESS_EVENT;
 
     }
-
-    // Update is called once per frame
     void Update()
     {
         
