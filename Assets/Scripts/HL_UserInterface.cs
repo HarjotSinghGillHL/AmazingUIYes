@@ -33,24 +33,31 @@ public class HL_UserInterface : MonoBehaviour
     public GameObject HealthBarForegroundGameObject = null;
     public GameObject HealthTextGameObject = null;
 
-    private Color colRgbaTestImage = Color.white;
+    public GameObject CoinsCollectedBarBackgroundGameObject = null;
+    public GameObject CoinsCollectedBarForegroundGameObject = null;
+    public GameObject CoinsCollectedTextGameObject = null;
 
     TextMeshProUGUI HealthTextObject = null;
     TextMeshProUGUI ScoreTextObject = null;
+    TextMeshProUGUI AbilityChargeText = null;
+    TextMeshProUGUI CoinsCollectedTextObject = null;
+
     UnityEngine.UI.Image RgbaTestImage = null;
     UnityEngine.UI.Image AbilityChargeImage = null;
     UnityEngine.UI.Image DropDownImage = null;
     UnityEngine.UI.Image HealthBackgroundImage = null;
     UnityEngine.UI.Image HealthForegroundImage = null;
-    TMP_InputField InputFieldObject = null;
-    TextMeshProUGUI AbilityChargeText = null;
+    UnityEngine.UI.Image CoinsCollectedBackgroundImage = null;
+    UnityEngine.UI.Image CoinsCollectedForegroundImage = null;
 
+    TMP_InputField InputFieldObject = null;
 
     TMP_Dropdown DropdownImageDropdownComponent = null;
 
-    int Score = 0;
-
-    int Health = 100;
+    private Color colRgbaTestImage = Color.white;
+    private int Score = 0;
+    private int Health = 100;
+    private int CollectedCoins = 0;
     void Start()
     {
         InputFieldObject = InputFieldGameObject.GetComponent<TMP_InputField>();
@@ -59,6 +66,10 @@ public class HL_UserInterface : MonoBehaviour
         HealthTextObject = HealthTextGameObject.GetComponent<TextMeshProUGUI>();
         HealthBackgroundImage = HealthBarBackgroundGameObject.GetComponent<UnityEngine.UI.Image>();
         HealthForegroundImage = HealthBarForegroundGameObject.GetComponent<UnityEngine.UI.Image>();
+       
+        CoinsCollectedTextObject = CoinsCollectedTextGameObject.GetComponent<TextMeshProUGUI>();
+        CoinsCollectedBackgroundImage = CoinsCollectedBarBackgroundGameObject.GetComponent<UnityEngine.UI.Image>();
+        CoinsCollectedForegroundImage = CoinsCollectedBarForegroundGameObject.GetComponent<UnityEngine.UI.Image>();
 
         ScoreTextObject = ScoreTextGameObject.GetComponent<TextMeshProUGUI>();
         RgbaTestImage = RgbaTestImageGameObject.GetComponent<UnityEngine.UI.Image>();
@@ -81,6 +92,15 @@ public class HL_UserInterface : MonoBehaviour
         }
     }
 
+    public void OnCoinCollected()
+    {
+        Debug.Log("Pressed");
+        CollectedCoins += 1;
+        CollectedCoins = Mathf.Clamp(CollectedCoins, 0, 10);
+        CoinsCollectedForegroundImage.fillAmount = (float)CollectedCoins / 10.0f;
+        CoinsCollectedTextObject.SetText(CollectedCoins+"/10");
+
+    }
     public void OnInputTextEditEnd(TMP_InputField _InputFieldObject)
     {
 
@@ -210,7 +230,7 @@ public class HL_UserInterface : MonoBehaviour
                 }
             case EButtonPressEvent.BEVENT_SET_SCORE_CUSTOM:
                 {
-                    if (InputFieldObject.text.Length > 0)
+                    if (InputFieldObject.text.Length > 0 && InputFieldObject.text != "")
                     {
                             Score = int.Parse(InputFieldObject.text);
                             goto LABEL_SCORE_UPDATE;
