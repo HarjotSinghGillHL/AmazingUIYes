@@ -24,24 +24,49 @@ public class HL_UserInterface : MonoBehaviour
     public GameObject KeyImageGameObject = null;
     public GameObject RgbaTestImageGameObject = null;
     public GameObject InputFieldGameObject = null;
+    public GameObject AbilityChargeGameObject = null;
+    public GameObject AbilityChargeTextGameObject = null;
+    public GameObject DropDownImageGameObject = null;
+    public GameObject DropDownGameObject = null;
+
+    public GameObject HealthBarBackgroundGameObject = null;
+    public GameObject HealthBarForegroundGameObject = null;
+    public GameObject HealthTextGameObject = null;
 
     private Color colRgbaTestImage = Color.white;
 
-    
+    TextMeshProUGUI HealthTextObject = null;
     TextMeshProUGUI ScoreTextObject = null;
     UnityEngine.UI.Image RgbaTestImage = null;
+    UnityEngine.UI.Image AbilityChargeImage = null;
+    UnityEngine.UI.Image DropDownImage = null;
+    UnityEngine.UI.Image HealthBackgroundImage = null;
+    UnityEngine.UI.Image HealthForegroundImage = null;
     TMP_InputField InputFieldObject = null;
+    TextMeshProUGUI AbilityChargeText = null;
 
+
+    TMP_Dropdown DropdownImageDropdownComponent = null;
 
     int Score = 0;
+
+    int Health = 100;
     void Start()
     {
         InputFieldObject = InputFieldGameObject.GetComponent<TMP_InputField>();
         InputFieldObject.textComponent.text = "343";
 
+        HealthTextObject = HealthTextGameObject.GetComponent<TextMeshProUGUI>();
+        HealthBackgroundImage = HealthBarBackgroundGameObject.GetComponent<UnityEngine.UI.Image>();
+        HealthForegroundImage = HealthBarForegroundGameObject.GetComponent<UnityEngine.UI.Image>();
+
         ScoreTextObject = ScoreTextGameObject.GetComponent<TextMeshProUGUI>();
         RgbaTestImage = RgbaTestImageGameObject.GetComponent<UnityEngine.UI.Image>();
- 
+
+        AbilityChargeImage = AbilityChargeGameObject.GetComponent<UnityEngine.UI.Image>();
+        DropDownImage = DropDownImageGameObject.GetComponent<UnityEngine.UI.Image>();
+        AbilityChargeText = AbilityChargeTextGameObject.GetComponent<TextMeshProUGUI>();
+        DropdownImageDropdownComponent = DropDownGameObject.GetComponent<TMP_Dropdown>();
     }
     private void Awake()
     {
@@ -71,6 +96,20 @@ public class HL_UserInterface : MonoBehaviour
 
     }
 
+    public void UpdateHealth(int NewHealth)
+    {
+        if (NewHealth == 0)
+            Health = 0;
+        else
+        {
+            Health += NewHealth;
+        }
+
+        Health = Mathf.Clamp(Health, 0, 100);
+        HealthForegroundImage.fillAmount = ((float)Health / 100.0f);
+        HealthForegroundImage.color = new Color(1.0f - (1.0f * HealthForegroundImage.fillAmount), 1.0f * HealthForegroundImage.fillAmount, HealthForegroundImage.color.b,1.0f);
+        HealthTextObject.SetText(Health.ToString());
+    }
     public void UpdateScore(int NewScore)
     {
         if (NewScore == 0)
@@ -85,6 +124,37 @@ public class HL_UserInterface : MonoBehaviour
         ScoreTextObject.SetText(Score.ToString());
     }
 
+    public void OnDropdownValueChange()
+    {
+        switch (DropdownImageDropdownComponent.value)
+        {
+            case 0:
+                {
+                    DropDownImage.color = Color.white;
+                    break;
+                }
+            case 1:
+                {
+                    DropDownImage.color = Color.red;
+                    break;
+                }
+            case 2:
+                {
+                    DropDownImage.color = Color.green;
+                    break;
+                }
+            case 3:
+                {
+                    DropDownImage.color = Color.blue;
+                    break;
+                }
+            default:
+                {
+                    break;
+                }
+        }
+
+    }
     public void OnSliderValueUpdate(UnityEngine.UI.Slider _Slider)
     {
         _Slider.gameObject.transform.Find("ValueText").GetComponent<TextMeshProUGUI>().SetText(((int)(_Slider.value * 255f)).ToString());
@@ -101,6 +171,10 @@ public class HL_UserInterface : MonoBehaviour
         RgbaTestImage.color = colRgbaTestImage;
     }
 
+    public void HandleAbilityRadialIndicator(GameObject CallerObject)
+    {
+        AbilityChargeImage.fillAmount = 0.0f;
+    }
     public void OnButtonEvent(int Event)
     {
         switch ((EButtonPressEvent)Event)
@@ -171,6 +245,12 @@ public class HL_UserInterface : MonoBehaviour
     }
     void Update()
     {
-        
+        if (AbilityChargeImage.fillAmount < 1.0f)
+        {
+            AbilityChargeImage.fillAmount += 1.0f * Time.deltaTime;
+            AbilityChargeImage.fillAmount = Mathf.Clamp(AbilityChargeImage.fillAmount, 0.0f, 1.0f);
+
+            AbilityChargeText.SetText("(Radial) Ability Charge : " + ((int)(AbilityChargeImage.fillAmount * 100.0f)));
+        }
     }
 }
